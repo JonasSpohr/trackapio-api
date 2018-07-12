@@ -1,15 +1,9 @@
-# This is a sample build configuration for deploying to HEROKU.
-# Only use spaces to indent your .yml configuration.
-# -----
-# You can specify a custom docker image from Dockerhub as your build environment.
-# image: java:8
-#
-# This script depends on two environment variables to be set in Bitbucket Pipelines
-# 1. $HEROKU_API_KEY - https://devcenter.heroku.com/articles/platform-api-quickstart
-# 2. $HEROKU_APP_NAME - Your app name in Heroku
-
+image: node:6
+clone:
+  depth: full
 pipelines:
   default:
     - step:
-        script: # Modify the commands below to build your repository.
-          - ./heroku-deploy.sh
+        script:
+          - npm install
+          - git push https://heroku:857b20a5-0fa8-491f-9458-9dc50369d57d@git.heroku.com/trackapio.git HEAD:master
