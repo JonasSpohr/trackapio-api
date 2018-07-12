@@ -1,0 +1,15 @@
+# This is a sample build configuration for deploying to HEROKU.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Dockerhub as your build environment.
+# image: java:8
+#
+# This script depends on two environment variables to be set in Bitbucket Pipelines
+# 1. $HEROKU_API_KEY - https://devcenter.heroku.com/articles/platform-api-quickstart
+# 2. $HEROKU_APP_NAME - Your app name in Heroku
+
+pipelines:
+  default:
+    - step:
+        script: # Modify the commands below to build your repository.
+          - ./heroku-deploy.sh
