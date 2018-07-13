@@ -1,8 +1,8 @@
 {
-  "companyId": "",
-  "userId": "",
-  "dateSchedule": "",
-  "urlNotification": "",
+  "companyId": "5b48be0402eebd0014cef631",
+  "userId": "5b2564b43ca749254842f5f8",
+  "dateSchedule": "2018-07-16",
+  "urlNotification": "https://trackapio.herokuapp.com/api/statusnotification/",
   "employee": {
     "name": "",
     "phone": "",
