@@ -123,7 +123,7 @@ function validateRoutePackages(route, callback) {
 
         }
     } catch (ex) {
-        callback(ex.message, false);
+        return callback(ex.message, false);
     }
 
     return callback(null, true);
@@ -176,6 +176,8 @@ async function rollbackPackages(packagesIds, callback) {
     for (let i = 0; i < packagesIds.length; i++) {
         await Package.findByIdAndRemove(packagesIds[i]);
     }
+
+    callback();
 }
 
 module.exports = router;
