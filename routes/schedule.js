@@ -48,7 +48,7 @@ router.post('/', asyncHandler(async (req, res) => {
     await newRoute.save();
 
     //for each package in the route, we need to validate if all required information were filled.
-    validateRoutePackages(req.body.route, async (err, isOk) => {
+    validateRoutePackages(req.body, async (err, isOk) => {
         if (!isOk) {
             return res.send({ success: false, errorMessage: err });
         }
@@ -144,7 +144,7 @@ async function createPackages(routeId, packages, callback) {
                 let clientNewUser = new User();
                 clientNewUser.active = true;
                 clientNewUser.email = originalPackage.email;
-                
+                await clientNewUser.save();
             }
 
             let beginStatus = new Status();

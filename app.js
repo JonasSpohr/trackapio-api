@@ -19,9 +19,15 @@ app.use(cookieParser());
 /* ROUTES */
 const auth = require('./routes/auth');
 const users = require('./routes/users');
+const schedule = require('./routes/schedule');
+const companies = require('./routes/companies');
+const employees = require('./routes/employees');
 
 app.use('/api/auth', auth);
 app.use('/api/users', users);
+app.use('/api/schedules', schedule);
+app.use('/api/companies', companies);
+app.use('/api/employees', employees);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
