@@ -12,14 +12,14 @@ const Status = require('../models/Status.js');
 const Client = require('../models/Client.js');
 
 router.post('/', asyncHandler(async (req, res) => { 
-    let companySchedule = await Company.findById(req.body.company);
+    let companySchedule = await Company.findById(req.body.companyId);
     if (companySchedule == null) {
         return res.send({ success: false, errorMessage: "Empresa parceira informada não encontrada." });
     }
 
     let userLogged = await User.findById(req.body.userId);
     if (userLogged == null) {
-        return res.send({ success: false, errorMessage: "Usuario logado informada não encontrado." });
+        return res.send({ success: false, errorMessage: "Usuario logado informado não encontrado." });
     }
 
     let employee = await Employee.findOne({ socialNumber: req.body.employee.socialNumber });

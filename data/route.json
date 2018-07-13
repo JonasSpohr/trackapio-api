@@ -1,0 +1,57 @@
+{
+  "companyId": "",
+  "userId": "",
+  "dateSchedule": "",
+  "urlNotification": "",
+  "employee": {
+    "name": "",
+    "phone": "",
+    "socialNumber": "",
+    "driverLicenseNumber": "",
+    "address": {
+      "street": "",
+      "number": "",
+      "complement": "",
+      "zipCode": "",
+      "city": "",
+      "state": "",
+      "country": ""
+    },
+    "email": "",
+    "active": ""
+  },
+  "packages": [
+    {
+      "client": {
+        "name": "",
+        "phone": "",
+        "socialNumber": "",
+        "address": {
+          "street": "",
+          "number": "",
+          "complement": "",
+          "zipCode": "",
+          "city": "",
+          "state": "",
+          "country": ""
+        },
+        "email": ""
+      },
+      "address": {
+        "street": "",
+        "number": "",
+        "complement": "",
+        "zipCode": "",
+        "city": "",
+        "state": "",
+        "country": ""
+      },
+      "name": "",
+      "estimatedDate": "",
+      "deliveredDate": "",
+      "number": "",
+      "quantityItems": "",
+      "order": ""
+    }
+  ]
+}

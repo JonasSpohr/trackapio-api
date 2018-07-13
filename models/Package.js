@@ -23,7 +23,7 @@ var PackageSchema = new mongoose.Schema({
   deliveredDate: { type: Date, required: false },
   number: { type: String, required: true },
   quantityItems: { type: Number, required: true },
-  order: { type: Number, required: true },
+  order: { type: Number, required: false },
   active: { type: Date, required: true },
   statusHistory: [{
     type: mongoose.Schema.Types.ObjectId,
