@@ -78,7 +78,7 @@ function validateRoutePackages(route, callback) {
                 return callback('Existem pacotes na rota sem cliente informado.', false);
             }
 
-            if (!pkg.client.nome || pkg.client.nome == '') {
+            if (!pkg.client.name || pkg.client.name == '') {
                 return callback('Existem clientes sem nome informado.', false);
             }
 
