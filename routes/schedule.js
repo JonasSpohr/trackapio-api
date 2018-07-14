@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const asyncHandler = require('express-async-handler');
 const SHA256 = require("crypto-js/sha256");
+const moment = require('moment');
 
 const User = require('../models/User.js');
 const Company = require('../models/Company.js');
@@ -78,14 +79,17 @@ router.post('/', asyncHandler(async (req, res) => {
 }));
 
 async function sendSMStoClient(packages, callback) {
+    moment.locale('pt-BR');
+
     for (let i = 0; i < packages.length; i++) {
         let pkg = await Package.findById(packages[i]).populate('client');
 
         if (pkg != null) {
+            let ptbrDate = moment(pkg.estimatedDate).format('L');
             let msg = await twilioClient.messages.create({
                 from: '+1 585-252-5012 ',
                 to: pkg.client.phone,
-                body: `Olá ${pkg.client.name}, o produto ${pkg.name} será entregue dia ${pkg.estimatedDate}. Responda SIM confimar ou NAO para cancelar.`
+                body: `Olá ${pkg.client.name}, o produto ${pkg.name} será entregue dia ${ptbrDate}. Responda SIM para confimar ou NAO para cancelar.`
             });
 
             pkg.smsSID = msg.sid;
