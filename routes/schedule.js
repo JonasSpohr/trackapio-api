@@ -86,10 +86,13 @@ async function sendSMStoClient(packages, callback) {
 
         if (pkg != null) {
             let ptbrDate = moment(pkg.estimatedDate).format('L');
+            let clientName = pkg.client.name.split('')[0];
+            let productName = pkg.name.substring(0, 15);
+            
             let msg = await twilioClient.messages.create({
                 from: '+1 585-252-5012 ',
                 to: pkg.client.phone,
-                body: `Olá ${pkg.client.name}, o produto ${pkg.name} será entregue dia ${ptbrDate}. Responda SIM para confimar ou NAO para cancelar.`
+                body: `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para parar de receber mensagens`
             });
 
             pkg.smsSID = msg.sid;
