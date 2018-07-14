@@ -137,7 +137,7 @@ async function createPackages(routeId, packages, callback) {
             let newPkg = new Package(packages[i]);
 
             let clientPackage = await Client.findOne({
-                socialNumber: newPkg.client.socialNumber
+                socialNumber: originalPackage.client.socialNumber
             });
 
             if (clientPackage == null) {
