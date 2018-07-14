@@ -85,18 +85,22 @@ async function sendSMStoClient(packages, callback) {
         let pkg = await Package.findById(packages[i]).populate('client');
 
         if (pkg != null) {
-            let ptbrDate = moment(pkg.estimatedDate).format('L');
-            let clientName = pkg.client.name.toString().split(' ')[0];
-            let productName = pkg.name.toString().substring(0, 15);
-            
-            let msg = await twilioClient.messages.create({
-                from: '+1 585-252-5012 ',
-                to: pkg.client.phone,
-                body: `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para parar de receber mensagens`
-            });
-
-            pkg.smsSID = msg.sid;
-            await pkg.save();
+            try{
+                let ptbrDate = moment(pkg.estimatedDate).format('L');
+                let clientName = pkg.client.name.toString().split(' ')[0];
+                let productName = pkg.name.toString().substring(0, 15);
+                
+                let msg = await twilioClient.messages.create({
+                    from: '+1 585-252-5012 ',
+                    to: pkg.client.phone,
+                    body: `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para parar de receber mensagens`
+                });
+    
+                pkg.smsSID = msg.sid;
+                await pkg.save();
+            }catch(ex){
+                console.log(`Error to send sms to client ${pkg.client.name}, phone: ${pkg.client.phone} error: ${ex.message}`);
+            }            
         }
     }
 
