@@ -86,8 +86,8 @@ async function sendSMStoClient(packages, callback) {
 
         if (pkg != null) {
             let ptbrDate = moment(pkg.estimatedDate).format('L');
-            let clientName = pkg.client.name.split('')[0];
-            let productName = pkg.name.substring(0, 15);
+            let clientName = pkg.client.name.toString().split(' ')[0];
+            let productName = pkg.name.toString().substring(0, 15);
             
             let msg = await twilioClient.messages.create({
                 from: '+1 585-252-5012 ',
