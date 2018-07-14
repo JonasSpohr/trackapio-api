@@ -141,12 +141,16 @@ async function createPackages(routeId, packages, callback) {
                 socialNumber: originalPackage.client.socialNumber
             });
 
-            if (clientPackage == null) {                
-                clientNewUser = new User();
-                clientNewUser.name = originalPackage.client.name;
-                clientNewUser.active = true;
-                clientNewUser.email = originalPackage.client.email;
-                await clientNewUser.save();
+            if (clientPackage == null) {
+                clientNewUser = await User.findOne({ email: originalPackage.client.email });
+
+                if (clientNewUser == null) {
+                    clientNewUser = new User();
+                    clientNewUser.name = originalPackage.client.name;
+                    clientNewUser.active = true;
+                    clientNewUser.email = originalPackage.client.email;
+                    await clientNewUser.save();
+                }
 
                 clientPackage = new Client(originalPackage.client);
                 clientPackage.user = clientNewUser._id;
