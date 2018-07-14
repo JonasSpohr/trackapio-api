@@ -61,7 +61,7 @@ router.post('/', asyncHandler(async (req, res) => {
                     return res.send({ success: false, errorMessage: err.message });
                 });
             } else {
-                newRoute.packages = result;
+                newRoute.packages = pkgIds;
                 await newRoute.save();
                 return res.send({ success: true, result: newRoute });
             }
