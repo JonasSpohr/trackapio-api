@@ -11,6 +11,11 @@ const Package = require('../models/Package.js');
 const Status = require('../models/Status.js');
 const Client = require('../models/Client.js');
 
+var twilioClient = require('twilio')(
+    'AC9316a5932135ed0174cfcdbf9728f3ab',
+    'c89d86fcd1da2213a0120c9ae55f9214'
+);
+
 router.post('/', asyncHandler(async (req, res) => {
     let companySchedule = await Company.findById(req.body.companyId);
     if (companySchedule == null) {
@@ -64,11 +69,32 @@ router.post('/', asyncHandler(async (req, res) => {
             } else {
                 newRoute.packages = pkgIds;
                 await newRoute.save();
-                return res.send({ success: true, result: newRoute });
+                sendSMStoClient(pkgIds, () => {
+                    return res.send({ success: true, result: newRoute });
+                });                
             }
         });
     });
 }));
+
+async function sendSMStoClient(packages, callback) {
+    for (let i = 0; i < packages.length; i++) {
+        let pkg = await Package.findById(packages[i]).populate('client');
+
+        if (pkg != null) {
+            let msg = await twilioClient.messages.create({
+                from: '+1 585-252-5012 ',
+                to: pkg.client.phone,
+                body: `Olá ${pkg.client.name}, o produto ${pkg.name} será entregue dia ${pkg.estimatedDate}. Responda SIM confimar ou NAO para cancelar.`
+            });
+
+            pkg.smsSID = msg.sid;
+            await pkg.save();
+        }
+    }
+
+    callback();
+}
 
 function validateRoutePackages(route, callback) {
     try {

@@ -29,6 +29,7 @@ var PackageSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Status'
   }],
+  smsSID : { type: String, required: false }
 });
 
 module.exports = mongoose.model('Package', PackageSchema);
