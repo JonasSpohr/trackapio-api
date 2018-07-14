@@ -142,6 +142,7 @@ async function createPackages(routeId, packages, callback) {
             });
 
             if (clientPackage == null) {                
+                clientNewUser = new User();
                 clientNewUser.name = originalPackage.client.name;
                 clientNewUser.active = true;
                 clientNewUser.email = originalPackage.client.email;
