@@ -166,6 +166,7 @@ async function createPackages(routeId, packages, callback) {
 
             newPkg.client = clientPackage._id;
             newPkg.route = routeId;
+            newPkg.active = true;
             newPkg.statusHistory = [];
             newPkg.statusHistory.push(beginStatus._id);
 
