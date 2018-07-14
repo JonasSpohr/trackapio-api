@@ -24,7 +24,7 @@ var PackageSchema = new mongoose.Schema({
   number: { type: String, required: true },
   quantityItems: { type: Number, required: true },
   order: { type: Number, required: false },
-  active: { type: Date, required: true },
+  active: { type: Boolean, required: true },
   statusHistory: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Status'
