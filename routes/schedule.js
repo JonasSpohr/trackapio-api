@@ -150,7 +150,7 @@ async function createPackages(routeId, packages, callback) {
             }
 
             let beginStatus = new Status();
-            beginStatus.statusHistory = 'CREATED';
+            beginStatus.status = 'CREATED';
             beginStatus.date = new Date();
             beginStatus.description = 'Registro criado.';
 
