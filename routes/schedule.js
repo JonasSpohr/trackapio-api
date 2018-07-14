@@ -11,7 +11,7 @@ const Package = require('../models/Package.js');
 const Status = require('../models/Status.js');
 const Client = require('../models/Client.js');
 
-router.post('/', asyncHandler(async (req, res) => { 
+router.post('/', asyncHandler(async (req, res) => {
     let companySchedule = await Company.findById(req.body.companyId);
     if (companySchedule == null) {
         return res.send({ success: false, errorMessage: "Empresa parceira informada não encontrada." });
@@ -56,7 +56,8 @@ router.post('/', asyncHandler(async (req, res) => {
         //after we validate all the packages, we need to save then in the database
         createPackages(newRoute._id, req.body.packages, async (err, pkgIds) => {
             if (err) {
-                rollbackPackages(pkgIds, () => {
+                rollbackPackages(pkgIds, async () => {
+                    await Route.findByIdAndRemove(newRoute._id);
                     return res.send({ success: false, errorMessage: err.message });
                 });
             } else {
@@ -142,8 +143,9 @@ async function createPackages(routeId, packages, callback) {
 
             if (clientPackage == null) {
                 let clientNewUser = new User();
+                clientNewUser.name = originalPackage.client.name;
                 clientNewUser.active = true;
-                clientNewUser.email = originalPackage.email;
+                clientNewUser.email = originalPackage.client.email;
                 await clientNewUser.save();
             }
 
