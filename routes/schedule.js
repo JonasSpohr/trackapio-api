@@ -50,6 +50,7 @@ router.post('/', asyncHandler(async (req, res) => {
     //for each package in the route, we need to validate if all required information were filled.
     validateRoutePackages(req.body, async (err, isOk) => {
         if (!isOk) {
+            await Route.findByIdAndRemove(newRoute._id);
             return res.send({ success: false, errorMessage: err });
         }
 
