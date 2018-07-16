@@ -93,15 +93,15 @@ async function sendSMStoClient(packages, callback) {
                 let clientName = pkg.client.name.toString().split(' ')[0];
                 let productName = pkg.name.toString().substring(0, 15);
                 
-                let msg = await totalVoiceClient.sms.enviar(pkg.client.phone, `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para parar de receber mensagens`);
+                let msgText = `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para parar de receber mensagens`;
+                let msg = await totalVoiceClient.sms.enviar(pkg.client.phone, msgText, true);
 
                 /*let msg = await twilioClient.messages.create({
                     from: '+1 585-252-5012 ',
                     to: pkg.client.phone,
                     body: `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para parar de receber mensagens`
                 });*/
-    
-                console.log(msg);
+
                 pkg.smsSID = msg.dados.id;
                 await pkg.save();
             }catch(ex){
