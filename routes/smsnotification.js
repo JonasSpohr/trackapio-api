@@ -96,7 +96,7 @@ async function sendSorrySMStoClient(id, callback) {
       pkg.smsSID = msg.dados.id;
       await pkg.save();
     } catch (ex) {
-      console.log(`Error to send cancel sms to client ${pkg.client.name}, phone: ${pkg.client.phone} error: ${ex.message}`);
+      console.log(`Error to send sorry sms to client ${pkg.client.name}, phone: ${pkg.client.phone} error: ${ex.message}`);
     }
   }
   callback();
