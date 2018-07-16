@@ -22,8 +22,6 @@ router.post('/answer', asyncHandler(async (req, res) => {
       await pkg.save();
   }
 
-  console.log(newStatus);
-
   return res.send({ success: true, result: "OK" });
 }));
 

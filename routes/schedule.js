@@ -12,11 +12,6 @@ const Package = require('../models/Package.js');
 const Status = require('../models/Status.js');
 const Client = require('../models/Client.js');
 
-var twilioClient = require('twilio')(
-    'AC9316a5932135ed0174cfcdbf9728f3ab',
-    'c89d86fcd1da2213a0120c9ae55f9214'
-);
-
 const totalvoice = require('totalvoice-node');
 const totalVoiceClient = new totalvoice("4b0ab141619c1f66edb946e42afc8ddb");
 
@@ -95,12 +90,6 @@ async function sendSMStoClient(packages, callback) {
                 
                 let msgText = `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para parar de receber mensagens`;
                 let msg = await totalVoiceClient.sms.enviar(pkg.client.phone, msgText, true);
-
-                /*let msg = await twilioClient.messages.create({
-                    from: '+1 585-252-5012 ',
-                    to: pkg.client.phone,
-                    body: `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para parar de receber mensagens`
-                });*/
 
                 pkg.smsSID = msg.dados.id;
                 await pkg.save();
