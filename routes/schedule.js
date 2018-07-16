@@ -76,6 +76,14 @@ router.post('/', asyncHandler(async (req, res) => {
     });
 }));
 
+router.get('/:scheduleId', asyncHandler(async (req, res) => {
+
+    let schedule = await Route.findById(req.params.scheduleId)
+    .populate("packages packages.client packages.statusHistory");
+
+    return res.send({ success: true, result: schedule });
+}));
+
 async function sendSMStoClient(packages, callback) {
     moment.locale('pt-BR');
 
@@ -88,7 +96,7 @@ async function sendSMStoClient(packages, callback) {
                 let clientName = pkg.client.name.toString().split(' ')[0];
                 let productName = pkg.name.toString().substring(0, 15);
                 
-                let msgText = `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para parar de receber mensagens`;
+                let msgText = `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para nao receber mensagens.`;
                 let msg = await totalVoiceClient.sms.enviar(pkg.client.phone, msgText, true);
 
                 pkg.smsSID = msg.dados.id;
