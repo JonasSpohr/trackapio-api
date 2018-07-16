@@ -4,6 +4,9 @@ const asyncHandler = require('express-async-handler');
 const moment = require('moment');
 
 router.post('/answer', asyncHandler(async (req, res) => {
+  
+  console.log(req.body);
+
   return res.send({ success: true, result: req.body });
 }));
 
