@@ -10,3 +10,5 @@ router.post('/answer', asyncHandler(async (req, res) => {
 router.post('/fail', asyncHandler(async (req, res) => {
   return res.send({ success: true, result: req });
 }));
+
+module.exports = router;
