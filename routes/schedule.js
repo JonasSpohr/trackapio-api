@@ -79,13 +79,20 @@ router.post('/', asyncHandler(async (req, res) => {
 router.get('/:scheduleId', asyncHandler(async (req, res) => {
 
     let schedule = await Route.findById(req.params.scheduleId)
-        .populate("client")
         .populate({
             path: 'packages',
             model: 'Package',
             populate: {
                 path: 'statusHistory',
                 model: 'Status'
+            }
+        })
+        .populate({
+            path: 'packages',
+            model: 'Package',
+            populate: {
+                path: 'client',
+                model: 'Client'
             }
         });
 
