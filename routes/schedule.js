@@ -70,7 +70,7 @@ router.post('/', asyncHandler(async (req, res) => {
                 await newRoute.save();
                 sendSMStoClient(pkgIds, () => {
                     return res.send({ success: true, result: newRoute });
-                });                
+                });
             }
         });
     });
@@ -79,7 +79,15 @@ router.post('/', asyncHandler(async (req, res) => {
 router.get('/:scheduleId', asyncHandler(async (req, res) => {
 
     let schedule = await Route.findById(req.params.scheduleId)
-    .populate("packages packages.client packages.statusHistory");
+        .populate("client")
+        .populate({
+            path: 'packages',
+            model: 'Package',
+            populate: {
+                path: 'statusHistory',
+                model: 'Status'
+            }
+        });
 
     return res.send({ success: true, result: schedule });
 }));
@@ -91,19 +99,19 @@ async function sendSMStoClient(packages, callback) {
         let pkg = await Package.findById(packages[i]).populate('client');
 
         if (pkg != null) {
-            try{
+            try {
                 let ptbrDate = moment(pkg.estimatedDate).format('L');
                 let clientName = pkg.client.name.toString().split(' ')[0];
                 let productName = pkg.name.toString().substring(0, 15);
-                
+
                 let msgText = `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para nao receber mensagens.`;
                 let msg = await totalVoiceClient.sms.enviar(pkg.client.phone, msgText, true);
 
                 pkg.smsSID = msg.dados.id;
                 await pkg.save();
-            }catch(ex){
+            } catch (ex) {
                 console.log(`Error to send sms to client ${pkg.client.name}, phone: ${pkg.client.phone} error: ${ex.message}`);
-            }            
+            }
         }
     }
 
