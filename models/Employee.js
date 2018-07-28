@@ -12,6 +12,7 @@ var EmployeeSchema = new mongoose.Schema({
     zipCode: { type: String, require: true },
     city: { type: String, require: true },
     state: { type: String, require: true },
+    district: { type: String, require: true },
     country: { type: String, require: false }
   },
   email: { type: String, require: false },
