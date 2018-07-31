@@ -100,6 +100,43 @@ router.get('/:scheduleId', asyncHandler(async (req, res) => {
     return res.send({ success: true, result: schedule });
 }));
 
+router.get('/all/:companyId', asyncHandler(async (req, res) => {
+    let page = 1;
+    let maxItems = 100000;
+
+    if (req.query.page) {
+        page = req.query.page;
+    }
+
+    if (req.query.maxItems) {
+        maxItems = req.query.maxItems;
+    }
+
+    let schedules = await Route.find({ company: req.params.companyId })
+        .populate("employee")
+        .populate({
+            path: 'packages',
+            model: 'Package',
+            populate: {
+                path: 'statusHistory',
+                model: 'Status'
+            }
+        })
+        .populate({
+            path: 'packages',
+            model: 'Package',
+            populate: {
+                path: 'client',
+                model: 'Client'
+            }
+        })
+        .sort({ "dateSchedule": "descending" })
+        .limit(maxItems)
+        .skip(page == 1 ? 0 : (page - 1) * maxItems);
+
+    return res.send({ success: true, result: schedules });
+}));
+
 async function sendSMStoClient(packages, callback) {
     moment.locale('pt-BR');
 
