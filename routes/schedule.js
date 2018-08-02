@@ -68,9 +68,13 @@ router.post('/', asyncHandler(async (req, res) => {
             } else {
                 newRoute.packages = pkgIds;
                 await newRoute.save();
-                sendSMStoClient(pkgIds, () => {
-                    return res.send({ success: true, result: newRoute });
-                });
+
+                //if this value is send with value true the route body also send the sms
+                if (req.body.processSendSMS == true) {
+                    sendSMStoClient(pkgIds, () => {
+                        return res.send({ success: true, result: newRoute });
+                    });
+                }
             }
         });
     });

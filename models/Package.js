@@ -21,8 +21,8 @@ var PackageSchema = new mongoose.Schema({
   name: { type: String, required: true },
   estimatedDate: { type: Date, required: true },
   deliveredDate: { type: Date, required: false },
-  number: { type: String, required: true },
-  quantityItems: { type: Number, required: true },
+  number: { type: String, required: false },
+  quantityItems: { type: Number, required: false },
   order: { type: Number, required: false },
   active: { type: Boolean, required: true },
   statusHistory: [{
