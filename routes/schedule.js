@@ -71,12 +71,41 @@ router.post('/', asyncHandler(async (req, res) => {
 
                 //if this value is send with value true the route body also send the sms
                 if (req.body.processSendSMS == true) {
-                    sendSMStoClient(pkgIds, () => {
+                    sendSMStoClient(pkgIds, async () => {
+                        newRoute.processed = true;
+                        await newRoute.save();
+
                         return res.send({ success: true, result: newRoute });
                     });
+                } else {
+                    return res.send({ success: true, result: newRoute });
                 }
             }
         });
+    });
+}));
+
+router.post('/process', asyncHandler(async (req, res) => {
+    let companySchedule = await Company.findById(req.body.companyId);
+    if (companySchedule == null) {
+        return res.send({ success: false, errorMessage: "Empresa parceira informada não encontrada." });
+    }
+
+    let schedule = await Route.findById(req.body.scheduleId);
+
+    if (schedule == null) {
+        return res.send({ success: false, errorMessage: "Rota não encontrada." });
+    }
+
+    let pkgIds = [];
+    for (let i = 0; i < schedule.packages.length; i++) {
+        pkgIds.push(schedule.packages[i]._id);
+    }
+
+    sendSMStoClient(pkgIds, async () => {
+        schedule.processed = true;
+        await schedule.save();
+        return res.send({ success: true, result: 'OK' });
     });
 }));
 
@@ -141,6 +170,48 @@ router.get('/all/:companyId', asyncHandler(async (req, res) => {
     return res.send({ success: true, result: schedules });
 }));
 
+router.delete('/:scheduleId', asyncHandler(async (req, res) => {
+    let schedule = await Route.findById(req.params.scheduleId)
+        .populate("employee")
+        .populate({
+            path: 'packages',
+            model: 'Package',
+            populate: {
+                path: 'statusHistory',
+                model: 'Status'
+            }
+        })
+        .populate({
+            path: 'packages',
+            model: 'Package',
+            populate: {
+                path: 'client',
+                model: 'Client'
+            }
+        });
+
+    if (schedule == null) {
+        return res.send({ success: false, errorMessage: "Rota não encontrada." });
+    }
+
+    for (let i = 0; i < schedule.packages.length; i++) {
+        let pkg = schedule.packages[i];
+        let pkgHistories = pkg.statusHistory;
+
+        for (let h = 0; h < pkgHistories.length; h++) {
+            let history = pkgHistories[h];
+
+            await Status.findByIdAndRemove(history._id);
+        }
+
+        await Package.findByIdAndRemove(pkg._id);
+    }
+
+    await Route.findByIdAndRemove(schedule._id);
+
+    return res.send({ success: true, result: 'OK' });
+}));
+
 async function sendSMStoClient(packages, callback) {
     moment.locale('pt-BR');
 
@@ -152,14 +223,15 @@ async function sendSMStoClient(packages, callback) {
                 let ptbrDate = moment(pkg.estimatedDate).format('L');
                 let clientName = pkg.client.name.toString().split(' ')[0];
                 let productName = pkg.name.toString().substring(0, 15);
+                let phoneNumber = pkg.client.phone.replace(' ', '').replace('-', '');
 
                 let msgText = `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para nao receber mensagens.`;
-                let msg = await totalVoiceClient.sms.enviar(pkg.client.phone, msgText, true);
+                let msg = await totalVoiceClient.sms.enviar(phoneNumber, msgText, true);
 
                 pkg.smsSID = msg.dados.id;
                 await pkg.save();
             } catch (ex) {
-                console.log(`Error to send sms to client ${pkg.client.name}, phone: ${pkg.client.phone} error: ${ex.message}`);
+                console.log(`Error to send sms to client ${pkg.client.name}, phone: ${phoneNumber} error: ${ex.message}`);
             }
         }
     }

@@ -16,7 +16,8 @@ var RouteSchema = new mongoose.Schema({
   dateSchedule: { type: Date, required: true },
   dateProcessed: { type: Date, required: false },
   active: { type: Boolean, required: true },
-  urlNotificaton: { type: String, required: false }
+  urlNotificaton: { type: String, required: false },
+  processed: { type: Boolean, required: false },
 });
 
 module.exports = mongoose.model('Route', RouteSchema);
