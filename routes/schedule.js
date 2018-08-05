@@ -15,6 +15,8 @@ const Client = require('../models/Client.js');
 const totalvoice = require('totalvoice-node');
 const totalVoiceClient = new totalvoice("4b0ab141619c1f66edb946e42afc8ddb");
 
+const replaceall = require('replaceall');
+
 router.post('/', asyncHandler(async (req, res) => {
     let companySchedule = await Company.findById(req.body.companyId);
     if (companySchedule == null) {
@@ -223,7 +225,7 @@ async function sendSMStoClient(packages, callback) {
                 let ptbrDate = moment(pkg.estimatedDate).format('L');
                 let clientName = pkg.client.name.toString().split(' ')[0];
                 let productName = pkg.name.toString().substring(0, 15);
-                let phoneNumber = pkg.client.phone.replace(' ', '').replace('-', '');
+                let phoneNumber = clearPhoneNumber(pkg.client.phone);
 
                 let msgText = `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para nao receber mensagens.`;
                 let msg = await totalVoiceClient.sms.enviar(phoneNumber, msgText, true);
@@ -359,6 +361,16 @@ async function rollbackPackages(packagesIds, callback) {
     }
 
     callback();
+}
+
+function clearPhoneNumber(phone){
+    let newPhone = phone;
+
+    newPhone = replaceall(newPhone, ' ', '');
+    newPhone = replaceall(newPhone, '-', '');
+    newPhone = replaceall(newPhone, '_', '');
+
+    return newPhone;
 }
 
 module.exports = router;
