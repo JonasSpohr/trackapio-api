@@ -219,13 +219,15 @@ async function sendSMStoClient(packages, callback) {
 
     for (let i = 0; i < packages.length; i++) {
         let pkg = await Package.findById(packages[i]).populate('client');
-
+        let phoneNumber = pkg.client.phone;
         if (pkg != null) {
             try {
                 let ptbrDate = moment(pkg.estimatedDate).format('L');
                 let clientName = pkg.client.name.toString().split(' ')[0];
                 let productName = pkg.name.toString().substring(0, 15);
-                let phoneNumber = clearPhoneNumber(pkg.client.phone);
+                phoneNumber = clearPhoneNumber(pkg.client.phone);
+
+                console.log(phoneNumber);
 
                 let msgText = `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para nao receber mensagens.`;
                 let msg = await totalVoiceClient.sms.enviar(phoneNumber, msgText, true);
@@ -363,12 +365,12 @@ async function rollbackPackages(packagesIds, callback) {
     callback();
 }
 
-function clearPhoneNumber(phone){
+function clearPhoneNumber(phone) {
     let newPhone = phone;
 
-    newPhone = replaceall(newPhone, ' ', '');
-    newPhone = replaceall(newPhone, '-', '');
-    newPhone = replaceall(newPhone, '_', '');
+    newPhone = replaceall(' ', '', newPhone);
+    newPhone = replaceall('-', '', newPhone);
+    newPhone = replaceall('_', '', newPhone);
 
     return newPhone;
 }

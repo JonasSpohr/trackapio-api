@@ -56,7 +56,7 @@ async function sendConfirmSMStoClient(id, callback) {
       let msgText = `${clientName}, perfeito! Aguarde a sua encomenda na data informada, agradecemos o contato.`;
       let phone = clearPhoneNumber(pkg.client.phone);
       let msg = await totalVoiceClient.sms.enviar(phone, msgText, true);
-      
+
     } catch (ex) {
       console.log(`Error to send confirm sms to client ${pkg.client.name}, phone: ${pkg.client.phone} error: ${ex.message}`);
     }
@@ -118,12 +118,12 @@ function parseTextAnswer(text) {
   return text;
 }
 
-function clearPhoneNumber(phone){
+function clearPhoneNumber(phone) {
   let newPhone = phone;
 
-  newPhone = replaceall(newPhone, ' ', '');
-  newPhone = replaceall(newPhone, '-', '');
-  newPhone = replaceall(newPhone, '_', '');
+  newPhone = replaceall(' ', '', newPhone);
+  newPhone = replaceall('-', '', newPhone);
+  newPhone = replaceall('_', '', newPhone);
 
   return newPhone;
 }
