@@ -9,6 +9,8 @@ const Status = require('../models/Status.js');
 const totalvoice = require('totalvoice-node');
 const totalVoiceClient = new totalvoice("4b0ab141619c1f66edb946e42afc8ddb");
 
+const replaceall = require('replaceall');
+
 router.post('/answer', asyncHandler(async (req, res) => {
   let pkg = await Package.findOne({ smsSID: req.body.sms_id });
 
