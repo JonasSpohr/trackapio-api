@@ -26,7 +26,8 @@ router.post('/email', asyncHandler(async (req, res) => {
         _id: user._id,
         name: user.name,
         authToken: user.authToken,
-        companyId : employee.company
+        companyId : employee.company,
+        type : employee.type
     }
 
     return res.send({ success: true, result: UsuarioRetorno });    

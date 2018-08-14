@@ -21,12 +21,14 @@ router.post('/', asyncHandler(async (req, res) => {
   newUser.phone = req.body.phone;
   newUser.pwd = SHA256('12345678').toString();
   newUser.active = true;
+  newUser.type = req.body.type;
   await newUser.save();
 
   let newEmployee = new Employee(req.body);
   newEmployee.active = true;
   newEmployee.user = newUser._id;
-  newEmployee.company = req.body.companyId;
+  newEmployee.type = req.body.type;
+  newEmployee.company = req.body.type;
 
   await newEmployee.save();
 
@@ -51,6 +53,7 @@ router.put('/', asyncHandler(async (req, res) => {
   employee.socialNumber = req.body.socialNumber;
   employee.driverLicenseNumber = req.body.driverLicenseNumber;
   employee.email = req.body.email;
+  employee.type = req.body.type;
 
   employee.address.street = req.body.address.street;
   employee.address.number = req.body.address.number;
@@ -92,7 +95,6 @@ router.delete('/:id', asyncHandler(async (req, res) => {
 
   return res.send({ success: true, result: employee });
 }));
-
 
 router.get('/routes/today/:employeeId', asyncHandler(async (req, res) => {
   let page = 1;

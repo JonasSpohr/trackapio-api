@@ -214,6 +214,48 @@ router.get('/all/:companyId/today/', asyncHandler(async (req, res) => {
     return res.send({ success: true, result: schedules });
 }));
 
+router.get('/employee/:employeeId/today/', asyncHandler(async (req, res) => {
+    let page = 1;
+    let maxItems = 100000;
+    let start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    let end = new Date();
+    end.setHours(23, 59, 59, 999);
+
+    if (req.query.page) {
+        page = req.query.page;
+    }
+
+    if (req.query.maxItems) {
+        maxItems = req.query.maxItems;
+    }
+
+    let schedules = await Route.find({ employee: req.params.employeeId, dateSchedule: { $gte: start, $lt: end } })
+        .populate("employee")
+        .populate({
+            path: 'packages',
+            model: 'Package',
+            populate: {
+                path: 'statusHistory',
+                model: 'Status'
+            }
+        })
+        .populate({
+            path: 'packages',
+            model: 'Package',
+            populate: {
+                path: 'client',
+                model: 'Client'
+            }
+        })
+        .sort({ "dateSchedule": "descending" })
+        .limit(maxItems)
+        .skip(page == 1 ? 0 : (page - 1) * maxItems);
+
+    return res.send({ success: true, result: schedules });
+}));
+
 router.delete('/:scheduleId', asyncHandler(async (req, res) => {
     let schedule = await Route.findById(req.params.scheduleId)
         .populate("employee")
