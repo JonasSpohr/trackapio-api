@@ -135,6 +135,13 @@ router.get('/:scheduleId', asyncHandler(async (req, res) => {
     return res.send({ success: true, result: schedule });
 }));
 
+router.get('/package/:packageId', asyncHandler(async (req, res) => {
+    let pkg = await Package.findById(req.params.packageId)
+        .populate('statusHistory client');
+
+    return res.send({ success: true, result: pkg });
+}));
+
 router.get('/all/:companyId', asyncHandler(async (req, res) => {
     let page = 1;
     let maxItems = 100000;
@@ -425,6 +432,7 @@ async function createPackages(routeId, packages, callback) {
             newPkg.active = true;
             newPkg.statusHistory = [];
             newPkg.statusHistory.push(beginStatus._id);
+            newPkg.deliveryStatus = 'PENDING';
 
             await newPkg.save();
             pkgIds.push(newPkg._id);
