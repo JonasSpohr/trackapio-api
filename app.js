@@ -5,16 +5,21 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const db = require('./bin/database');
+//const fileUpload = require('express-fileupload');
 
 const app = express();
 
-const whitelist = ['*']
-app.use(cors(whitelist));
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Origin, X-Requested-With, Content-Type, Accept, user_id, auth_token");
+  next();
+});
 
 app.use(logger('dev'));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '50mb' }));
 app.use(cookieParser());
+//app.use(fileUpload());
 
 /* ROUTES */
 const auth = require('./routes/auth');

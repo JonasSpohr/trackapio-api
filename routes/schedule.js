@@ -1,4 +1,5 @@
 const express = require('express');
+var path = require('path')
 const router = express.Router();
 const asyncHandler = require('express-async-handler');
 const SHA256 = require("crypto-js/sha256");
@@ -15,7 +16,32 @@ const Client = require('../models/Client.js');
 const totalvoice = require('totalvoice-node');
 const totalVoiceClient = new totalvoice("4b0ab141619c1f66edb946e42afc8ddb");
 
+var multer = require('multer');
+
 const replaceall = require('replaceall');
+
+router.post('/import', asyncHandler(async (req, res) => {
+    let fileName = '';
+    var storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, './uploads/')
+        },
+        filename: function (req, file, cb) {
+            fileName = file.fieldname + '-' + Date.now() + path.extname(file.originalname);
+            console.log(fileName)
+            cb(null, fileName)
+        }
+    })
+
+    var upload = multer({ storage: storage }).single('file')
+    upload(req, res, function (err) {
+        if (err) {
+            console.log(err);
+            return res.send({ success: false, errorMessage: "Erro ao salvar o arquivo." });
+        }        
+        return res.send({ success: true, result: 'Sucesso ao realizar o upload' });
+    });    
+}));
 
 router.post('/', asyncHandler(async (req, res) => {
     let companySchedule = await Company.findById(req.body.companyId);

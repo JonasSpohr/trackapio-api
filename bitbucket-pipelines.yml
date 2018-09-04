@@ -6,4 +6,4 @@ pipelines:
     - step:
         script:
           - npm install
-          - git push https://heroku:857b20a5-0fa8-491f-9458-9dc50369d57d@git.heroku.com/trackapio.git HEAD:master
+          - git push https://heroku:857b20a5-0fa8-491f-9458-9dc50369d57d@git.heroku.com/trackapio-admin.git HEAD:master
