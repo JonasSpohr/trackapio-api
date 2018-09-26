@@ -344,7 +344,7 @@ async function sendSMStoClient(packages, callback) {
                 let productName = pkg.name.toString().substring(0, 15);
                 phoneNumber = clearPhoneNumber(pkg.client.phone);
 
-                let msgText = `${clientName}, o pedido ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para nao receber mensagens.`;
+                let msgText = `${clientName}, o pedido ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para nao receber mensagens. Att. JadLog`;
                 let msg = await totalVoiceClient.sms.enviar(phoneNumber, msgText, true);
 
                 pkg.smsSID = msg.dados.id;
