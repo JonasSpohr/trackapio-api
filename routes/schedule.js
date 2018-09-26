@@ -1,4 +1,5 @@
 const express = require('express');
+var path = require('path')
 const router = express.Router();
 const asyncHandler = require('express-async-handler');
 const SHA256 = require("crypto-js/sha256");
@@ -15,6 +16,7 @@ const Client = require('../models/Client.js');
 const totalvoice = require('totalvoice-node');
 const totalVoiceClient = new totalvoice("4b0ab141619c1f66edb946e42afc8ddb");
 
+<<<<<<< HEAD
 var fs = require('fs'), PDFParser = require("pdf2json");
 
 router.post('/pdfimport', asyncHandler(async (req, res) => {
@@ -31,6 +33,34 @@ router.post('/pdfimport', asyncHandler(async (req, res) => {
     return res.send({ success: true, result: 'OK' });
     
 }))
+=======
+var multer = require('multer');
+
+const replaceall = require('replaceall');
+
+router.post('/import', asyncHandler(async (req, res) => {
+    let fileName = '';
+    var storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, './uploads/')
+        },
+        filename: function (req, file, cb) {
+            fileName = file.fieldname + '-' + Date.now() + path.extname(file.originalname);
+            console.log(fileName)
+            cb(null, fileName)
+        }
+    })
+
+    var upload = multer({ storage: storage }).single('file')
+    upload(req, res, function (err) {
+        if (err) {
+            console.log(err);
+            return res.send({ success: false, errorMessage: "Erro ao salvar o arquivo." });
+        }        
+        return res.send({ success: true, result: 'Sucesso ao realizar o upload' });
+    });    
+}));
+>>>>>>> 634eb4c04fc7494fb0a9686c78ac3dca17b0d2cc
 
 router.post('/', asyncHandler(async (req, res) => {
     let companySchedule = await Company.findById(req.body.companyId);
@@ -150,6 +180,13 @@ router.get('/:scheduleId', asyncHandler(async (req, res) => {
     return res.send({ success: true, result: schedule });
 }));
 
+router.get('/package/:packageId', asyncHandler(async (req, res) => {
+    let pkg = await Package.findById(req.params.packageId)
+        .populate('statusHistory client');
+
+    return res.send({ success: true, result: pkg });
+}));
+
 router.get('/all/:companyId', asyncHandler(async (req, res) => {
     let page = 1;
     let maxItems = 100000;
@@ -163,6 +200,90 @@ router.get('/all/:companyId', asyncHandler(async (req, res) => {
     }
 
     let schedules = await Route.find({ company: req.params.companyId })
+        .populate("employee")
+        .populate({
+            path: 'packages',
+            model: 'Package',
+            populate: {
+                path: 'statusHistory',
+                model: 'Status'
+            }
+        })
+        .populate({
+            path: 'packages',
+            model: 'Package',
+            populate: {
+                path: 'client',
+                model: 'Client'
+            }
+        })
+        .sort({ "dateSchedule": "descending" })
+        .limit(maxItems)
+        .skip(page == 1 ? 0 : (page - 1) * maxItems);
+
+    return res.send({ success: true, result: schedules });
+}));
+
+router.get('/all/:companyId/today/', asyncHandler(async (req, res) => {
+    let page = 1;
+    let maxItems = 100000;
+    let start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    let end = new Date();
+    end.setHours(23, 59, 59, 999);
+
+    if (req.query.page) {
+        page = req.query.page;
+    }
+
+    if (req.query.maxItems) {
+        maxItems = req.query.maxItems;
+    }
+
+    let schedules = await Route.find({ company: req.params.companyId, dateSchedule: { $gte: start, $lt: end } })
+        .populate("employee")
+        .populate({
+            path: 'packages',
+            model: 'Package',
+            populate: {
+                path: 'statusHistory',
+                model: 'Status'
+            }
+        })
+        .populate({
+            path: 'packages',
+            model: 'Package',
+            populate: {
+                path: 'client',
+                model: 'Client'
+            }
+        })
+        .sort({ "dateSchedule": "descending" })
+        .limit(maxItems)
+        .skip(page == 1 ? 0 : (page - 1) * maxItems);
+
+    return res.send({ success: true, result: schedules });
+}));
+
+router.get('/employee/:employeeId/today/', asyncHandler(async (req, res) => {
+    let page = 1;
+    let maxItems = 100000;
+    let start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    let end = new Date();
+    end.setHours(23, 59, 59, 999);
+
+    if (req.query.page) {
+        page = req.query.page;
+    }
+
+    if (req.query.maxItems) {
+        maxItems = req.query.maxItems;
+    }
+
+    let schedules = await Route.find({ employee: req.params.employeeId, dateSchedule: { $gte: start, $lt: end } })
         .populate("employee")
         .populate({
             path: 'packages',
@@ -234,13 +355,13 @@ async function sendSMStoClient(packages, callback) {
 
     for (let i = 0; i < packages.length; i++) {
         let pkg = await Package.findById(packages[i]).populate('client');
-
+        let phoneNumber = pkg.client.phone;
         if (pkg != null) {
             try {
                 let ptbrDate = moment(pkg.estimatedDate).format('L');
                 let clientName = pkg.client.name.toString().split(' ')[0];
                 let productName = pkg.name.toString().substring(0, 15);
-                let phoneNumber = pkg.client.phone.replace(' ', '').replace('-', '');
+                phoneNumber = clearPhoneNumber(pkg.client.phone);
 
                 let msgText = `${clientName}, o pedido ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para nao receber mensagens.`;
                 let msg = await totalVoiceClient.sms.enviar(phoneNumber, msgText, true);
@@ -356,6 +477,7 @@ async function createPackages(routeId, packages, callback) {
             newPkg.active = true;
             newPkg.statusHistory = [];
             newPkg.statusHistory.push(beginStatus._id);
+            newPkg.deliveryStatus = 'PENDING';
 
             await newPkg.save();
             pkgIds.push(newPkg._id);
@@ -376,6 +498,16 @@ async function rollbackPackages(packagesIds, callback) {
     }
 
     callback();
+}
+
+function clearPhoneNumber(phone) {
+    let newPhone = phone;
+
+    newPhone = replaceall(' ', '', newPhone);
+    newPhone = replaceall('-', '', newPhone);
+    newPhone = replaceall('_', '', newPhone);
+
+    return newPhone;
 }
 
 module.exports = router;

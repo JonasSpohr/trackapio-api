@@ -4,6 +4,7 @@ const SHA256 = require("crypto-js/sha256");
 const asyncHandler = require('express-async-handler');
 
 const User = require('../models/User.js');
+const Employee = require('../models/Employee.js');
 
 router.post('/email', asyncHandler(async (req, res) => {
     let pwdCrypt = SHA256(req.body.pwd);
@@ -19,9 +20,15 @@ router.post('/email', asyncHandler(async (req, res) => {
 
     await user.save();
 
+    let employee = await Employee.findOne({ user : user._id });
+
     let UsuarioRetorno = {
         _id: user._id,
-        authToken: user.authToken
+        name: user.name,
+        authToken: user.authToken,
+        companyId : employee.company,
+        employeeId : employee._id,
+        type : employee.type
     }
 
     return res.send({ success: true, result: UsuarioRetorno });    

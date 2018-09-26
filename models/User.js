@@ -7,6 +7,7 @@ var UserSchema = new mongoose.Schema({
   pwd: { type: String, required: false },
   authToken: { type: String, required: false },
   lastLoginDate: { type: Date, required : false },
+  type: { type: String, required: false },
   active: Boolean
 });
 
