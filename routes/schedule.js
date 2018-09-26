@@ -15,6 +15,23 @@ const Client = require('../models/Client.js');
 const totalvoice = require('totalvoice-node');
 const totalVoiceClient = new totalvoice("4b0ab141619c1f66edb946e42afc8ddb");
 
+var fs = require('fs'), PDFParser = require("pdf2json");
+
+router.post('/pdfimport', asyncHandler(async (req, res) => {
+    let pdfParser = new PDFParser();
+
+    pdfParser.on("pdfParser_dataError", errData => console.error(errData) );
+    pdfParser.on("pdfParser_dataReady", pdfData => {
+        fs.writeFile("./files/ListaEntrega29456_01.json", JSON.stringify(pdfData));
+    });
+ 
+    pdfParser.loadPDF("./files/ListaEntrega29456.pdf");
+
+    
+    return res.send({ success: true, result: 'OK' });
+    
+}))
+
 router.post('/', asyncHandler(async (req, res) => {
     let companySchedule = await Company.findById(req.body.companyId);
     if (companySchedule == null) {
@@ -225,7 +242,7 @@ async function sendSMStoClient(packages, callback) {
                 let productName = pkg.name.toString().substring(0, 15);
                 let phoneNumber = pkg.client.phone.replace(' ', '').replace('-', '');
 
-                let msgText = `${clientName}, o produto ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para nao receber mensagens.`;
+                let msgText = `${clientName}, o pedido ${productName} será entregue ${ptbrDate}. Responda SIM para confimar ou NAO para o recebimento. STOP para nao receber mensagens.`;
                 let msg = await totalVoiceClient.sms.enviar(phoneNumber, msgText, true);
 
                 pkg.smsSID = msg.dados.id;
